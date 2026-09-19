@@ -69,7 +69,7 @@ Tests use [Vitest](https://vitest.dev) and live under `tests/`, one file per
 `src/` module: `grid.test.ts`, `randomColor.test.ts`, `saveFile.test.ts`
 (filesystem calls mocked — no disk writes), and `sockets.test.ts` (spins up a
 real `http`+`Socket.io` server on an ephemeral port and drives it with
-`socket.io-client`, including regression tests for the crash bugs below).
+`socket.io-client`, including regression tests for previously-fixed crash bugs).
 Run `npm test` once or `npm run test:watch` while developing.
 
 ## Code style
@@ -85,6 +85,22 @@ npm test
 ```
 
 All four run in CI (`.github/workflows/ci.yml`) on every push/PR to `main`.
+
+## Docker
+
+`Dockerfile` is a multi-stage build (compile in a `node:25.2.0-alpine` stage,
+copy `dist/`+`public/` into a slim production-deps-only runtime stage). Build
+and run it locally with:
+
+```bash
+docker build -t pixel-beat .
+docker run -p 8000:8000 pixel-beat
+```
+
+On every push to `main` that passes CI, `.github/workflows/ci.yml`'s
+`docker-release` job builds and pushes the image to
+`ghcr.io/fb-univ/pixel-beat` (tagged `latest` and with the commit's short SHA)
+and creates a matching GitHub Release. Pull requests do not trigger a publish.
 
 ## PR checklist
 
