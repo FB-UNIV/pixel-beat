@@ -27,16 +27,23 @@ export function registerSocketHandlers(io: Server, grid: Grid) {
     // Send him the good stuff
     socket.emit("init", grid, saveFiles);
     socket.on("paint_cell", ({ x, y }: { x: number; y: number }, value: number) => {
-      const cell: Cell = grid[x][y];
+      const isValidCoordinate =
+        Number.isInteger(x) &&
+        x >= 0 &&
+        x < grid.length &&
+        Number.isInteger(y) &&
+        y >= 0 &&
+        y < grid[0].length;
 
-      // Check if cell exists
-      if (cell) {
-        cell.value = value;
-        cell.color = user.color;
-        cell.username = user.username;
+      if (!isValidCoordinate || typeof value !== "number" || !Number.isFinite(value)) {
+        return;
       }
 
-      console.log(cell);
+      const cell: Cell = grid[x][y];
+      cell.value = value;
+      cell.color = user.color;
+      cell.username = user.username;
+
       // Update for all connected clients
       io.emit("update_cell", { x: x, y: y, color: cell.color, value: cell.value });
     });
@@ -65,9 +72,15 @@ export function registerSocketHandlers(io: Server, grid: Grid) {
 
     socket.on("select_save_file", (fileId) => {
       const user = users[socket.id];
+      const saveFile = saveFiles[fileId];
+
+      if (!saveFile) {
+        console.log(user.username + " tried to load an unknown save file: " + fileId);
+        return;
+      }
 
       console.log(user.username + " is loading file : " + fileId);
-      grid = loadSaveFile(saveFiles[fileId], user);
+      grid = loadSaveFile(saveFile);
       io.emit("load_grid", grid);
     });
 

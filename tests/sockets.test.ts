@@ -9,9 +9,6 @@ import { createGrid } from "../src/models/Grid";
 import type { User } from "../src/models/User";
 import type { SaveFile } from "../src/models/SaveFile";
 
-// Happy-path only: known invalid inputs (out-of-range paint_cell coordinates,
-// unknown select_save_file ids) currently crash the server — see the
-// /ecc:dev-team review. Regression tests for those are deferred with the fix.
 describe("registerSocketHandlers", () => {
   let httpServer: HttpServer;
   let io: SocketIOServer;
@@ -134,6 +131,53 @@ describe("registerSocketHandlers", () => {
     const grid = await loadPromise;
     expect(Array.isArray(grid)).toBe(true);
     expect((grid as unknown[]).length).toBe(32);
+    client.disconnect();
+  });
+
+  // Regression tests for the crash bugs found in the /ecc:dev-team review:
+  // both paint_cell and select_save_file used to throw on invalid input,
+  // taking the whole server down for every connected client.
+  it("ignores paint_cell with out-of-range coordinates instead of crashing", async () => {
+    const { client } = await connectAndWaitForInit();
+
+    let sawUpdate = false;
+    client.on("update_cell", () => {
+      sawUpdate = true;
+    });
+    client.emit("paint_cell", { x: -1, y: 99 }, 1);
+
+    // Prove the connection (and server) survives: a subsequent valid paint
+    // still works and broadcasts normally.
+    const updatePromise = new Promise<{ x: number; y: number }>((resolve) =>
+      client.once("update_cell", resolve),
+    );
+    client.emit("paint_cell", { x: 0, y: 0 }, 1);
+    const update = await updatePromise;
+
+    expect(sawUpdate).toBe(true); // only the valid paint's broadcast
+    expect(update.x).toBe(0);
+    expect(update.y).toBe(0);
+    client.disconnect();
+  });
+
+  it("ignores select_save_file with an unknown id instead of crashing", async () => {
+    const { client } = await connectAndWaitForInit();
+
+    let sawLoad = false;
+    client.on("load_grid", () => {
+      sawLoad = true;
+    });
+    client.emit("select_save_file", "does-not-exist");
+
+    // Prove the server is still alive by round-tripping a username change.
+    const updatePromise = new Promise<Record<string, User>>((resolve) =>
+      client.once("update_user_list", resolve),
+    );
+    client.emit("update_username", "StillAlive");
+    const users = await updatePromise;
+
+    expect(sawLoad).toBe(false);
+    expect(Object.values(users).map((u) => u.username)).toContain("StillAlive");
     client.disconnect();
   });
 });

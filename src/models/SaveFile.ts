@@ -38,24 +38,23 @@ export function saveGrid(grid: Grid, user: User): SaveFile {
   return saveFile;
 }
 
-export function loadSaveFile(fileToLoad: SaveFile, user: User): Grid {
+export function loadSaveFile(fileToLoad: SaveFile): Grid {
   // create an empty Grid
   const grid: Grid = createGrid(32);
 
-  let buffer = new Uint8Array(32 * 32);
-  buffer = readFileSync(fileToLoad.uri);
+  const buffer = readFileSync(fileToLoad.uri);
 
+  // The .bin format only stores each cell's `value` byte — it never recorded
+  // per-cell username/color, so a load leaves those null rather than
+  // stamping the loading user onto every cell (that implied they painted
+  // the whole grid, which isn't real data).
   for (let x = 0; x < 32; x++) {
     for (let y = 0; y < 32; y++) {
       const index = x * 32 + y;
-      const cell = grid[x][y];
-
-      cell.username = user.username;
-      cell.color = user.color;
-      cell.value = buffer[index];
+      grid[x][y].value = buffer[index];
     }
   }
-  // go read the file
+
   return grid;
 }
 

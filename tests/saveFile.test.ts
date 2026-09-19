@@ -41,7 +41,7 @@ describe("saveGrid", () => {
 });
 
 describe("loadSaveFile", () => {
-  it("rehydrates a grid from a saved buffer and stamps it with the loading user", () => {
+  it("rehydrates a grid's cell values from a saved buffer", () => {
     const buffer = new Uint8Array(32 * 32);
     buffer[5] = 3; // x=0, y=5 (index = x*32 + y)
     vi.mocked(readFileSync).mockReturnValue(buffer as unknown as ReturnType<typeof readFileSync>);
@@ -53,12 +53,27 @@ describe("loadSaveFile", () => {
       format: ".bin",
       uri: "public/assets/someone-id1.bin",
     };
-    const grid = loadSaveFile(saveFile, user);
+    const grid = loadSaveFile(saveFile);
 
     expect(readFileSync).toHaveBeenCalledWith(saveFile.uri);
     expect(grid[0][5].value).toBe(3);
-    expect(grid[0][5].username).toBe(user.username);
-    expect(grid[0][5].color).toBe(user.color);
+  });
+
+  it("does not stamp the loading user onto cells — the .bin format never stored attribution", () => {
+    const buffer = new Uint8Array(32 * 32);
+    vi.mocked(readFileSync).mockReturnValue(buffer as unknown as ReturnType<typeof readFileSync>);
+
+    const saveFile: SaveFile = {
+      id: "id2",
+      path: "public/assets/",
+      name: "someone",
+      format: ".bin",
+      uri: "public/assets/someone-id2.bin",
+    };
+    const grid = loadSaveFile(saveFile);
+
+    expect(grid[0][0].username).toBeNull();
+    expect(grid[0][0].color).toBeNull();
   });
 });
 

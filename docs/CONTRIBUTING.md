@@ -69,11 +69,8 @@ Tests use [Vitest](https://vitest.dev) and live under `tests/`, one file per
 `src/` module: `grid.test.ts`, `randomColor.test.ts`, `saveFile.test.ts`
 (filesystem calls mocked — no disk writes), and `sockets.test.ts` (spins up a
 real `http`+`Socket.io` server on an ephemeral port and drives it with
-`socket.io-client`). Run `npm test` once or `npm run test:watch` while
-developing. The socket tests intentionally only cover valid input — known
-crash bugs in `paint_cell`/`select_save_file` (out-of-range coordinates /
-unknown save-file ids) are not yet fixed; add regression tests alongside
-that fix when it lands.
+`socket.io-client`, including regression tests for the crash bugs below).
+Run `npm test` once or `npm run test:watch` while developing.
 
 ## Code style
 
