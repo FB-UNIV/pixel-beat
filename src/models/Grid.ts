@@ -12,6 +12,6 @@ export function createGrid(size = 32): Grid {
       username: null,
       color: null,
       value: 0,
-    }))
+    })),
   );
 }

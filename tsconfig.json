@@ -8,5 +8,6 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["node_modules", "dist", "tests", "vitest.config.ts", "eslint.config.js"]
 }

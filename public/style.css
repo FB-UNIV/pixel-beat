@@ -1,4 +1,5 @@
-html,body {
+html,
+body {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -21,7 +22,8 @@ html,body {
   box-sizing: border-box;
 }
 
-.userControls, .gridControls {
+.userControls,
+.gridControls {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -74,10 +76,10 @@ html,body {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content{
+.modal-content {
   background-color: lightgray;
   margin: 15% auto;
   padding: 20px;
@@ -92,7 +94,7 @@ form {
   width: 80%;
 }
 
-.close{
+.close {
   color: #aaaaaa;
   float: right;
   font-size: 28px;
@@ -122,4 +124,3 @@ form {
 #formContent input[type="radio"] {
   margin: 0;
 }
-

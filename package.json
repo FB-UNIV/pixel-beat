@@ -2,20 +2,37 @@
   "name": "pixel-wars",
   "version": "1.0.0",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
+    "postinstall": "node -e \"require('fs').mkdirSync('public/assets',{recursive:true})\"",
     "start": "ts-node src/server.ts",
     "build": "tsc",
-    "prod": "node dist/server.js"
+    "prod": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "express": "^5.1.0",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/express": "^5.0.5",
     "@types/node": "^24.10.1",
     "@types/socket.io": "^3.0.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "socket.io-client": "^4.8.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^3.2.4"
   }
 }

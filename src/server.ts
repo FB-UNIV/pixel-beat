@@ -19,5 +19,5 @@ registerSocketHandlers(io, createGrid(gridSize));
 app.use(express.static("public"));
 
 server.listen(8000, () => {
-  console.log('Server is litening on port 8000');
+  console.log("Server is litening on port 8000");
 });
