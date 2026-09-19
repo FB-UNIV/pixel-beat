@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+tests
+docs
+.claude
+.git
+.github
+*.md
+.nvmrc
+.prettierrc.json
+.prettierignore
+eslint.config.mjs
+vitest.config.ts
+public/assets/*
