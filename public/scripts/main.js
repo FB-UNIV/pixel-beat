@@ -163,7 +163,7 @@ socket.on("init", (serverGrid, saveFiles) => {
 
 socket.on("update_cell", ({ x, y, color, value }) => {
   clientGrid[x][y].value = value;
-  clientGrid[x][y].color = value;
+  clientGrid[x][y].color = color;
   updateUiCell(x, y, color, value);
 });
 
