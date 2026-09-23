@@ -2,6 +2,7 @@ node_modules
 dist
 coverage
 .claude
+package-lock.json
 
 !public
 !public/assets
