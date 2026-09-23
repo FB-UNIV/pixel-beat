@@ -1,5 +1,12 @@
 # PIXEL BEAT
 
+## AI Usage
+
+Claude is used to perform code reviews from time to time to catch any bugs and security issues.
+It also helped me to setup Tests and CI pipelines !
+
+Apart from that all code written is mine.
+
 ## Installation
 
 1. install nvm : [nvm documentation](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)
