@@ -50,11 +50,15 @@ export function registerSocketHandlers(io: Server, grid: Grid) {
 
     socket.on("update_username", (newUsername: string) => {
       // Get the username set on the client Side
-      user.username = newUsername;
+      // Sanitation for new usersame as per #4
+      if (typeof newUsername !== "string") return;
+      const trimmed = newUsername.trim();
+      if (trimmed.length === 0 || trimmed.length > 24) return;
 
+      // Set the new username (trimmed)
+      user.username = trimmed;
       // CHange the username of the corresponding user in the ServerUserList
       users[socket.id] = user;
-
       // Notify all clients that a user changed it's username
       io.emit("update_user_list", users);
     });

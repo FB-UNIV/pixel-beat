@@ -183,37 +183,31 @@ describe("registerSocketHandlers", () => {
 
   // Regression test for the unvalidated update_username event causing a later
   // SaveFile call to crash the server
-  it.each([
-    12345,
-    undefined,
-    null,
-    {},
-    ["array"],
-    "",
-    "    ",
-    "x".repeat(100),
-  ])("should not crash when save_grid runs after an invalid update_username", async (badUsername) => {
-    const { client, saveFiles: initalSaveFiles} = await connectAndWaitForInit();
-    const before = new Set(Object.keys(initalSaveFiles as Record<string, SaveFile>));
+  it.each([12345, undefined, null, {}, ["array"], "", "    ", "x".repeat(100)])(
+    "should not crash when save_grid runs after an invalid update_username",
+    async (badUsername) => {
+      const { client, saveFiles: initalSaveFiles } = await connectAndWaitForInit();
+      const before = new Set(Object.keys(initalSaveFiles as Record<string, SaveFile>));
 
-    // Send bad username
-    client.emit("update_username", badUsername);
+      // Send bad username
+      client.emit("update_username", badUsername);
 
-    const savedPromise = new Promise<Record<string, SaveFile>>((resolve) =>
-      client.once("update_save_files_list", resolve),
-    );
+      const savedPromise = new Promise<Record<string, SaveFile>>((resolve) =>
+        client.once("update_save_files_list", resolve),
+      );
 
-    // Save grid to crash the server before #4 implementation
-    client.emit("save_grid");
+      // Save grid to crash the server before #4 implementation
+      client.emit("save_grid");
 
-    const saveFiles = await savedPromise;
-    const added = Object.values(saveFiles).filter((f) => !before.has(f.id));
-    expect(added).toHaveLength(1);
-    createdFiles.push(added[0].uri);
+      const saveFiles = await savedPromise;
+      const added = Object.values(saveFiles).filter((f) => !before.has(f.id));
+      expect(added).toHaveLength(1);
+      createdFiles.push(added[0].uri);
 
-    // SaveFiles take name of the user, this proves the username was left at default instead of using bad username
-    const defaultName = ("Guest_" + client.id.slice(0,4)).replace(/[^a-zA-Z0-9]/g,"_");
-    expect(added[0].name).toBe(defaultName);
-    client.disconnect();
-  });
+      // SaveFiles take name of the user, this proves the username was left at default instead of using bad username
+      const defaultName = ("Guest_" + client.id.slice(0, 4)).replace(/[^a-zA-Z0-9]/g, "_");
+      expect(added[0].name).toBe(defaultName);
+      client.disconnect();
+    },
+  );
 });
