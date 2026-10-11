@@ -180,4 +180,26 @@ describe("registerSocketHandlers", () => {
     expect(Object.values(users).map((u) => u.username)).toContain("StillAlive");
     client.disconnect();
   });
+
+  // Regression test for the unvalidated update_username event causing a later
+  // SaveFile call to crash the server
+  it("should not crash when save_grid runs after an invalid update_username", async () => {
+    const { client } = await connectAndWaitForInit();
+
+    // Send non string data for username
+    client.emit("update_username", 12345);
+
+    const savedPromise = new Promise<Record<string, SaveFile>>((resolve) =>
+      client.once("update_save_files_list", resolve),
+    );
+
+    // Save grid to crash the server
+    client.emit("save_grid");
+
+    const saveFiles = await savedPromise;
+    const mine = Object.values(saveFiles).filter((f) => f.name.startsWith("Guest_"));
+    expect(mine.length).toBeGreaterThan(0);
+    mine.forEach((f) => createdFiles.push(f.uri));
+    client.disconnect();
+  });
 });
